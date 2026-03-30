@@ -1,0 +1,101 @@
+"""
+Simple Rock Paper Scissors GUI using Tkinter.
+Click a choice to play against the computer and track the score.
+"""
+
+import random
+import tkinter as tk
+
+
+def get_computer_choice():
+    choices = ["rock", "paper", "scissors"]
+    return random.choice(choices)
+
+
+def determine_winner(player_choice, computer_choice):
+    if player_choice == computer_choice:
+        return "It's a tie!"
+    if (
+        (player_choice == "rock" and computer_choice == "scissors")
+        or (player_choice == "paper" and computer_choice == "rock")
+        or (player_choice == "scissors" and computer_choice == "paper")
+    ):
+        return "You win!"
+    return "Computer wins!"
+
+
+class RPSApp:
+    def __init__(self, root):
+        self.root = root
+        root.title("Rock Paper Scissors")
+
+        self.player_score = 0
+        self.computer_score = 0
+        self.tie_count = 0
+
+        self.status_var = tk.StringVar(value="Pick rock, paper, or scissors.")
+        self.score_var = tk.StringVar()
+        self.update_score()
+
+        title = tk.Label(root, text="Rock Paper Scissors", font=("Segoe UI", 14, "bold"))
+        title.pack(pady=(12, 4))
+
+        score_label = tk.Label(root, textvariable=self.score_var, font=("Segoe UI", 11))
+        score_label.pack(pady=4)
+
+        button_frame = tk.Frame(root)
+        button_frame.pack(pady=8)
+
+        for choice in ["rock", "paper", "scissors"]:
+            btn = tk.Button(
+                button_frame,
+                text=choice.title(),
+                width=12,
+                command=lambda c=choice: self.play_round(c),
+            )
+            btn.pack(side=tk.LEFT, padx=6)
+
+        status_label = tk.Label(root, textvariable=self.status_var, font=("Segoe UI", 10))
+        status_label.pack(pady=8)
+
+        reset_button = tk.Button(root, text="Reset Score", command=self.reset)
+        reset_button.pack(pady=(4, 10))
+
+    def play_round(self, player_choice):
+        computer_choice = get_computer_choice()
+        result = determine_winner(player_choice, computer_choice)
+
+        if result == "You win!":
+            self.player_score += 1
+        elif result == "Computer wins!":
+            self.computer_score += 1
+        else:
+            self.tie_count += 1
+
+        self.update_score()
+        self.status_var.set(
+            f"You chose {player_choice}, computer chose {computer_choice}. {result}"
+        )
+
+    def reset(self):
+        self.player_score = 0
+        self.computer_score = 0
+        self.tie_count = 0
+        self.update_score()
+        self.status_var.set("Scores reset. Pick rock, paper, or scissors.")
+
+    def update_score(self):
+        rounds = self.player_score + self.computer_score + self.tie_count
+        self.score_var.set(
+            f"Player wins: {self.player_score}  |  Computer wins: {self.computer_score}  |  Ties: {self.tie_count}  |  Rounds: {rounds}"
+        )
+
+
+def main():
+    root = tk.Tk()
+    RPSApp(root)
+    root.mainloop()
+
+
+if __name__ == "__main__":
+    main()
